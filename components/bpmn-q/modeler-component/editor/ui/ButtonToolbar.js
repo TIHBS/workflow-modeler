@@ -9,6 +9,7 @@ import UploadButton from "./UploadButton";
 import ShortcutPlugin from "../shortcut/ShortcutPlugin";
 import XMLViewerButton from "./XMLViewerButton";
 import PlanqkSaveButton from "./PlanqkSaveButton";
+import PlanqkDeploymentButton from "./PlanqkDeploymentButton";
 
 /**
  * React component which displays the toolbar of the modeler
@@ -25,12 +26,14 @@ export default function ButtonToolbar(props) {
   return (
     <Fragment>
       {planqkIntegration && (
-        <div className="qwm-toolbar">
-          <PlanqkSaveButton modeler={modeler} />
-        </div>
+          <div className="qwm-toolbar">
+            <PlanqkSaveButton modeler={modeler}/>
+            <hr className="qwm-toolbar-splitter"/>
+            <PlanqkDeploymentButton modeler={modeler}/>
+          </div>
       )}
       {!planqkIntegration && (
-        <div className="qwm-toolbar">
+          <div className="qwm-toolbar">
           <hr className="qwm-toolbar-splitter" />
           <NewDiagramButton modeler={modeler} />
           <SaveButton modeler={modeler} />
