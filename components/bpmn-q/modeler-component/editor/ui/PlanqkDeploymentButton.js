@@ -1,7 +1,7 @@
 import React from "react";
 import NotificationHandler from "./notifications/NotificationHandler";
 import {dispatchWorkflowTransformedEvent} from "../util/IoUtilities";
-import { startPlanqkReplacementProcess } from "../../extensions/planqk/exec-completion/PlanQKServiceTaskCompletion";
+import { startPlanqkReplacementProcess } from "../../extensions/planqk/replacement/PlanQKTransformator";
 import { startDataFlowReplacementProcess } from "../../extensions/data-extension/transformation/TransformationManager";
 
 /**
@@ -48,7 +48,7 @@ export default function PlanqkDeploymentButton(props) {
       });
       return;
     }
-    console.log("Camunda BPMN resulting from transformation:", xml);
+    console.log("Camunda BPMN resulting from transformation:", replaceResult.xml);
 
     NotificationHandler.getInstance().displayNotification({
       title: "Deployment to Camunda engine started",
