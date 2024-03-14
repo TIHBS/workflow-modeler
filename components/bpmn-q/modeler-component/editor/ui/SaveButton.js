@@ -9,11 +9,11 @@ import { saveModelerAsLocalFile } from "../util/IoUtilities";
  * @constructor
  */
 export default function SaveButton(props) {
-  const { modeler } = props;
+  const { modeler, planqkIntegration } = props;
 
   return (
     <div>
-      <button className="qwm-toolbar-btn" title="Save workflow">
+      <button className="qwm-toolbar-btn" title={planqkIntegration ? "Export workflow to file" : "Save workflow"}>
         <div style={{ display: "flex" }}>
           <div style={{ display: "flex" }}>
             <span
@@ -22,7 +22,7 @@ export default function SaveButton(props) {
                 saveModelerAsLocalFile(modeler);
               }}
             >
-              <span className="qwm-indent">Save</span>
+              <span className="qwm-indent">{planqkIntegration ? "Export" : "Save"}</span>
             </span>
           </div>
         </div>
