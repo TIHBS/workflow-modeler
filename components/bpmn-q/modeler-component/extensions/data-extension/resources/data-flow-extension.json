@@ -14,8 +14,40 @@
           "name": "content",
           "isMany": true,
           "type": "KeyValueEntry"
+        },
+        {
+          "name": "schemaExample",
+          "type": "String"
+        },
+        {
+          "name": "inputFor",
+          "type": "dataflow:ServiceTaskInputType",
+          "isAttr": true
+        },
+        {
+          "name": "visibility",
+          "type": "dataflow:DataObjectVisibility",
+          "isAttr": true
         }
       ]
+    },
+    {
+      "name": "ProcessInputDataMapObject",
+      "superClass": ["dataflow:DataMapObject"],
+      "properties": [
+      ]
+    },
+    {
+      "name": "ProcessOutputDataMapObject",
+      "superClass": ["dataflow:DataMapObject"],
+      "properties": [
+        {
+          "name": "schema",
+          "isMany": true,
+          "type": "String"
+        }
+      ],
+      "required": ["schema"]
     },
     {
       "name": "DataStoreMap",
@@ -76,6 +108,27 @@
       ]
     }
   ],
-  "enumerations": [],
+  "enumerations": [{
+    "name": "DataObjectVisibility",
+    "literalValues": [
+      {
+        "name": "private"
+      },
+      {
+        "name": "public"
+      }
+    ]
+  },
+    {
+      "name": "ServiceTaskInputType",
+      "literalValues": [
+        {
+          "name": "data"
+        },
+        {
+          "name": "params"
+        }
+      ]
+    }],
   "associations": []
 }

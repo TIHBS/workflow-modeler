@@ -60,6 +60,16 @@
           "name": "result",
           "isAttr": true,
           "type": "String"
+        },
+        {
+          "name": "inputSchemaExample",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "resultSchemaExample",
+          "isAttr": true,
+          "type": "String"
         }
       ]
     },
