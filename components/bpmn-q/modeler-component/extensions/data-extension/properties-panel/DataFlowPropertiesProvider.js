@@ -405,10 +405,8 @@ function PlanqkTextArea(props) {
 function PlanqkRadioChoice(props) {
     const {
         id,
-        // label,
         element,
         title = 'please select',
-        // value = '',
         choices
     } = props;
     const [open, setOpen] = useLayoutState(['groups', id, 'open'], false);
@@ -493,12 +491,12 @@ function PlanqkRadioChoice(props) {
                     children: [
                         jsx(
                             "div", {
-                                class: "bio-properties-panel-entry",
-                                "data-entry-id":"documentation",
+                                class: "planqk-properties-panel-radio-choice-item-set bio-properties-panel-entry",
+                                title: title,
                                 children: [
                                     jsx(
                                         "div", {
-                                            class: "bio-properties-panel-radio-choice",
+                                            class: "planqk-properties-panel-radio-choice-item",
                                             children: [
                                                 jsx(
                                                     "label", {
@@ -518,6 +516,13 @@ function PlanqkRadioChoice(props) {
                                                         onChange,
                                                     }
                                                 ),
+                                            ]
+                                        },
+                                    ),
+                                    jsx(
+                                        "div", {
+                                            class: "planqk-properties-panel-radio-choice-item",
+                                            children: [
                                                 jsx(
                                                     "label", {
                                                         for: choices[1],
