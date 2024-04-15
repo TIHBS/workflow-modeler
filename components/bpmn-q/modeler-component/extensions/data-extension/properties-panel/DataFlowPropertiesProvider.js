@@ -1,11 +1,10 @@
 import keyValueMap from "./KeyValueMap";
 import { is } from "bpmn-js/lib/util/ModelUtil";
-import {ListGroup, useLayoutState, useShowEntryEvent} from "@bpmn-io/properties-panel";
+import {ListGroup, TextAreaEntry, useLayoutState, useShowEntryEvent} from "@bpmn-io/properties-panel";
 import * as consts from "../Constants";
 import * as configConsts from "../../../editor/configurations/Constants";
 import ConfigurationsProperties from "../../../editor/configurations/ConfigurationsProperties";
 import { getTransformationTaskConfiguration } from "../transf-task-configs/TransformationTaskConfigurations";
-import {useEffect, useLayoutEffect, useMemo, useState} from "@bpmn-io/properties-panel/preact/hooks";
 import {jsx, jsxs} from "@bpmn-io/properties-panel/preact/jsx-runtime";
 import classnames from "classnames";
 import {debounce} from 'min-dash';
@@ -183,7 +182,6 @@ function createDataMapObjectGroupForSchemaExample(element, injector, translate) 
     // return {
     id: "dataMapObjectPropertiesForSchemaExample",
     label: translate("Schema Example"),
-    value: element.businessObject.id,
     component: PlanqkTextArea,
   };
   console.log(xxx);
@@ -308,25 +306,11 @@ function createTransformationTaskConfigurationsGroup(
 }
 
 
-function resizeToContents(element) {
-  element.style.height = 'auto';
-
-  // a 2px pixel offset is required to prevent scrollbar from
-  // appearing on OS with a full length scroll bar (Windows/Linux)
-  element.style.height = `${element.scrollHeight + 2}px`;
-}
 function PlanqkTextArea(props) {
     const {
         id,
         label,
         element,
-        value = '',
-        disabled,
-        monospace,
-        onFocus,
-        onBlur,
-        autoResize,
-        rows = autoResize ? 1 : 2
     } = props;
     const [open, setOpen] = useLayoutState(['groups', id, 'open'], false);
     const toggleOpen = () => {
@@ -335,48 +319,13 @@ function PlanqkTextArea(props) {
         console.log(open);
     };
     const modeling = useService("modeling");
-    const [localValue, setLocalValue] = useState(value);
-    const ref = useShowEntryEvent(id);
-    const handleInputCallback = useMemo(() => {
-        return debounce(({
-                             target
-                         }) => onInput(target.value.length ? target.value : undefined));
-    }, [onInput, debounce]);
-    // const getValue = () => {
-    //     return element.businessObject.schemaExample;
-    // };
+    const getValue = () => {
+        return element.businessObject.schemaExample || '';
+    };
     const setValue = (value) => {
         modeling.updateProperties(element, {
-            dataPoolLink: value,
+            schemaExample: value,
         });
-    };
-    const handleInput = e => {
-        handleInputCallback(e);
-        autoResize && resizeToContents(e.target);
-        setLocalValue(e.target.value);
-        setValue(e.target.value);
-    };
-    useLayoutEffect(() => {
-        autoResize && resizeToContents(ref.current);
-    }, []);
-    useEffect(() => {
-        if (value === localValue) {
-            return;
-        }
-        setLocalValue(value);
-    }, [value]);
-    const onInput = newValue => {
-        // let newValidationError = null;
-        // if (isFunction(validate)) {
-        //   newValidationError = validate(newValue) || null;
-        // }
-        // if (newValidationError) {
-        //   setCachedInvalidValue(newValue);
-        // } else {
-        //   setValue(newValue);
-        // }
-        // setLocalError(newValidationError);
-        setLocalValue(newValue);
     };
 
     return jsxs("div", {
@@ -433,36 +382,16 @@ function PlanqkTextArea(props) {
                                 class: "bio-properties-panel-entry",
                                 "data-entry-id":"documentation",
                                 children: [
-                                    jsx(
-                                        "div", {
-                                            class: "bio-properties-panel-textarea",
-                                            children: [
-                                                jsx(
-                                                    "label", {
-                                                        for: `bio-properties-panel-` + id,
-                                                        class: "bio-properties-panel-label",
-                                                        children: label
-                                                    }
-                                                ),
-                                                jsx(
-                                                    "textarea", {
-                                                        ref: ref,
-                                                        id: `bio-properties-panel-` + id,
-                                                        name: id,
-                                                        spellCheck: "false",
-                                                        class: classnames('bio-properties-panel-input', monospace ? 'bio-properties-panel-input-monospace' : '', autoResize ? 'auto-resize' : ''),
-                                                        onInput: handleInput,
-                                                        onFocus: onFocus,
-                                                        onBlur: onBlur,
-                                                        rows: rows,
-                                                        value: localValue,
-                                                        disabled: disabled,
-                                                        "data-gramm": "false"
-                                                    }
-                                                )
-                                            ]
-                                        }
-                                    )
+                                    TextAreaEntry({
+                                        element,
+                                        id: "data_map_description",
+                                        label: "Schema Example",
+                                        description: "Provide an OpenAPI specification example of the schema.",
+                                        getValue,
+                                        setValue,
+                                        debounce,
+                                        rows: 3,
+                                    })
                                 ]
                             }
                         )
