@@ -62,7 +62,7 @@ export default function DataFlowPropertiesProvider(
 
       // remove unwanted groups
       if (is(element, consts.DATA_MAP_OBJECT) || is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) || is(element, consts.PROCESS_OUTPUT_DATA_MAP_OBJECT)) {
-        const removeLabels = ["Extension properties"];
+        const removeLabels = ["Extension properties", "Documentation", "General"];
         modifiedGroups = groups.filter(function(item) {
           return removeLabels.indexOf(item.label) === -1;
         });
@@ -84,7 +84,15 @@ export default function DataFlowPropertiesProvider(
         console.log("isElement INPUT");
         modifiedGroups.push(createDataMapObjectGroupForSchemaExample(element, injector, translate));
         modifiedGroups.push(createDataMapObjectGroupForPrivatePublicChoice(element, injector, translate));
+        if( !element.businessObject.visibility ) {
+          //set default for visibility to "public"
+          Object.defineProperty(element.businessObject, "visibility", {value: "public", writable: true});
+        }
         modifiedGroups.push(createDataMapObjectGroupForDataParamChoice(element, injector, translate));
+        if( !element.businessObject.inputFor ) {
+          //set default for inputFor to "data"
+          Object.defineProperty(element.businessObject, "inputFor", {value: "data", writable: true});
+        }
       }
 
       // add group for displaying the details attribute of a DataStoreMap as a key value map
@@ -319,6 +327,34 @@ function PlanqkTextArea(props) {
         console.log(open);
     };
     const modeling = useService("modeling");
+
+    const computeNameOfNode = () => {
+        let targetNodeName = '';
+        if(element.outgoing.length > 0) {
+            element.outgoing.forEach( (outgoing) => {
+                let associationLine = null;
+                element.parent.children.forEach((child) => {
+                    if (child.id === outgoing.id) {
+                        associationLine = child;
+                    }
+                })
+                if(associationLine != null) {
+                    targetNodeName += associationLine.businessObject.$parent.name;
+                }
+            })
+        }
+        return "Input" + element.businessObject.inputFor + (targetNodeName.length > 0 ? '_' + targetNodeName : '');
+    }
+    const adjustNameOfNode = () => {
+        const nameShouldBe = computeNameOfNode();
+        if( element.businessObject.name === nameShouldBe ) {
+            console.log("ist schon alles ok");
+        } else {
+            modeling.updateProperties(element, {name: nameShouldBe});
+        }
+    }
+    adjustNameOfNode();
+
     const getValue = () => {
         return element.businessObject.schemaExample || '';
     };
