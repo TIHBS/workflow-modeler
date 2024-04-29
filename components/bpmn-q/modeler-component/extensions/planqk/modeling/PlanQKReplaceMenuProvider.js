@@ -130,8 +130,8 @@ export default class PlanQKMenuProvider {
     return {
       ["replace-by-more-planqk-task-options"]: createMoreOptionsEntryWithReturn(
         element,
-        "PlanQK Service Tasks",
-        "PlanQK Service Tasks",
+        "PlanQK Service Tasks title",
+        "PlanQK Service Tasks entryName",
         popupMenu,
         options,
         "qwm-planqk-icon-service-task"

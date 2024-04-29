@@ -62,9 +62,15 @@ export default function DataFlowPropertiesProvider(
 
       // remove unwanted groups
       if (is(element, consts.DATA_MAP_OBJECT) || is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) || is(element, consts.PROCESS_OUTPUT_DATA_MAP_OBJECT)) {
-        const removeLabels = ["Extension properties", "Documentation", "General"];
+        const removeLabels = ["Extension properties", "Documentation"];
         modifiedGroups = groups.filter(function(item) {
           return removeLabels.indexOf(item.label) === -1;
+        });
+      }
+      if (is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) || is(element, consts.PROCESS_OUTPUT_DATA_MAP_OBJECT)) {
+        const removeLabels = ["General"];
+        modifiedGroups = groups.filter(function(item) {
+        return removeLabels.indexOf(item.label) === -1;
         });
       }
 
@@ -75,13 +81,17 @@ export default function DataFlowPropertiesProvider(
 
       // add group for displaying the content attribute of a DataMapObject as a key value map
       if (is(element, consts.DATA_MAP_OBJECT) || is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) || is(element, consts.PROCESS_OUTPUT_DATA_MAP_OBJECT)) {
-        console.log("isElement DATA_MAP / INPUT / OUTPUT");
         modifiedGroups.push(createDataMapObjectGroupForContent(element, injector, translate));
+      }
+
+      // add group for the automatic naming of the node
+      // this only works for input/output nodes
+      if (is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) || is(element, consts.PROCESS_OUTPUT_DATA_MAP_OBJECT)) {
+        modifiedGroups.push(createObjectGroupForNodeNaming(element));
       }
 
       // add further groups for Input-DataMap
       if (is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT)) {
-        console.log("isElement INPUT");
         modifiedGroups.push(createDataMapObjectGroupForSchemaExample(element, injector, translate));
         modifiedGroups.push(createDataMapObjectGroupForPrivatePublicChoice(element, injector, translate));
         if( !element.businessObject.visibility ) {
@@ -93,6 +103,11 @@ export default function DataFlowPropertiesProvider(
           //set default for inputFor to "data"
           Object.defineProperty(element.businessObject, "inputFor", {value: "data", writable: true});
         }
+      }
+
+      // add further groups for Output-DataMap
+      if (is(element, consts.PROCESS_OUTPUT_DATA_MAP_OBJECT)) {
+        modifiedGroups.push(createDataMapObjectGroupForSchemaExample(element, injector, translate));
       }
 
       // add group for displaying the details attribute of a DataStoreMap as a key value map
@@ -194,6 +209,18 @@ function createDataMapObjectGroupForSchemaExample(element, injector, translate) 
   };
   console.log(xxx);
   return xxx;
+}
+
+function createObjectGroupForNodeNaming(element) {
+    console.log("createObjectGroupForNodeNaming");
+    let xxx = {
+        // return {
+        id: "dataMapObjectNaming",
+        element: element,
+        component: PlanqkNodeNaming,
+    };
+    console.log(xxx);
+    return xxx;
 }
 
 function createDataMapObjectGroupForPrivatePublicChoice(element, injector, translate) {
@@ -322,38 +349,9 @@ function PlanqkTextArea(props) {
     } = props;
     const [open, setOpen] = useLayoutState(['groups', id, 'open'], false);
     const toggleOpen = () => {
-        console.log("toggle open -> ");
         setOpen(!open);
-        console.log(open);
     };
     const modeling = useService("modeling");
-
-    const computeNameOfNode = () => {
-        let targetNodeName = '';
-        if(element.outgoing.length > 0) {
-            element.outgoing.forEach( (outgoing) => {
-                let associationLine = null;
-                element.parent.children.forEach((child) => {
-                    if (child.id === outgoing.id) {
-                        associationLine = child;
-                    }
-                })
-                if(associationLine != null) {
-                    targetNodeName += associationLine.businessObject.$parent.name;
-                }
-            })
-        }
-        return "Input" + element.businessObject.inputFor + (targetNodeName.length > 0 ? '_' + targetNodeName : '');
-    }
-    const adjustNameOfNode = () => {
-        const nameShouldBe = computeNameOfNode();
-        if( element.businessObject.name === nameShouldBe ) {
-            console.log("ist schon alles ok");
-        } else {
-            modeling.updateProperties(element, {name: nameShouldBe});
-        }
-    }
-    adjustNameOfNode();
 
     const getValue = () => {
         return element.businessObject.schemaExample || '';
@@ -438,6 +436,42 @@ function PlanqkTextArea(props) {
     });
 }
 
+function PlanqkNodeNaming(props) {
+    const {
+        element,
+    } = props;
+    const modeling = useService("modeling");
+
+    const computeNameOfNode = () => {
+        let targetNodeNames = '';
+        let connectors = is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) ? element.outgoing : element.incoming;
+        if(connectors.length > 0) {
+            connectors.forEach( (connector) => {
+                let associationLine = null;
+                element.parent.children.forEach((child) => {
+                    if (child.id === connector.id) {
+                        associationLine = child;
+                    }
+                })
+                if(associationLine != null) {
+                    targetNodeNames += associationLine.businessObject.$parent.name;
+                }
+            })
+        }
+        const prefix = is(element, consts.PROCESS_INPUT_DATA_MAP_OBJECT) ? 'Input' + element.businessObject.inputFor : 'Output';
+        return prefix + (targetNodeNames.length > 0 ? '_' + targetNodeNames : '');
+    }
+    const adjustNameOfNode = () => {
+        const nameShouldBe = computeNameOfNode();
+        if( element.businessObject.name !== nameShouldBe ) {
+            modeling.updateProperties(element, {name: nameShouldBe});
+        }
+    }
+    adjustNameOfNode();
+
+    return '';
+}
+
 function PlanqkRadioChoice(props) {
     const {
         id,
@@ -447,11 +481,8 @@ function PlanqkRadioChoice(props) {
     } = props;
     const [open, setOpen] = useLayoutState(['groups', id, 'open'], false);
     const toggleOpen = () => {
-        console.log("toggle open radio choice -> ");
         setOpen(!open);
-        console.log(open);
     };
-    // const [localValue, setLocalValue] = useState(value);
     const ref = useShowEntryEvent(id);
     const modeling = useService("modeling");
 

@@ -14,6 +14,7 @@ export default {
     "planqkReplaceMenuProvider",
     "activeSubscriptions",
     "dataPools",
+    "openApiMap",
   ],
   planqkReplaceMenuProvider: ["type", PlanQKReplaceMenuProvider],
   planqkPaletteProvider: ["type", PlanQKPaletteProvider],
@@ -30,6 +31,12 @@ export default {
     "type",
     () => {
       return getPluginConfig("planqk").oauthInfoByAppMap || {};
+    },
+  ],
+  openApiMap: [
+    "type",
+    () => {
+      return getPluginConfig("planqk").openApiMap || {};
     },
   ],
   dataPools: [
