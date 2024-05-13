@@ -61,6 +61,8 @@ export async function saveXmlAsLocalFile(
  *
  * @param modeler The bpmn modeler the bpmn diagram is opened in.
  * @param fileName The name of the file.
+ * @param fileFormat hmmmmmmmmm
+ * @param openWindow hmmmmmmmmm
  * @returns {Promise<void>}
  */
 export async function saveModelerAsLocalFile(
@@ -93,18 +95,22 @@ export async function saveModelerAsLocalFile(
 
 export async function dispatchWorkflowChangedEvent(modeler) {
   const xml = await getXml(modeler);
+  const svg = await getWorkflowAsSVG(modeler);
 
   dispatchWorkflowEvent(
       "workflow-changed",
       xml,
+      svg.svg,
       editorConfig.getFileName()
   );
 }
 
-export async function dispatchWorkflowTransformedEvent(xmlTransformed) {
+export async function dispatchWorkflowTransformedEvent(modeler, xmlTransformed) {
+  const svg = await getWorkflowAsSVG(modeler);
   dispatchWorkflowEvent(
       "workflow-transformed",
       xmlTransformed,
+      svg.svg,
       editorConfig.getFileName()
   );
 }
@@ -114,6 +120,7 @@ export async function dispatchWorkflowTransformedEvent(xmlTransformed) {
  * Simple Getter which returns the opened bpmn diagram of the given bpmn modeler as a xml diagram.
  *
  * @param modeler The bpmn modeler the bpmn diagram is opened in.
+ * @param format hmmmmmm
  * @returns {Promise<*>} The xml diagram.
  */
 export async function getXml(modeler, format = true) {
@@ -345,7 +352,7 @@ export function setAutoSaveInterval(
   autoSaveFileOption = editorConfig.getAutoSaveFileOption()
 ) {
   if (autoSaveFileOption === autoSaveFile.DISABLED) {
-    return;
+    // do nothing
   } else if (autoSaveFileOption === autoSaveFile.INTERVAL) {
     getModeler().autosaveIntervalId = setInterval(() => {
       saveFile();
@@ -423,6 +430,10 @@ export async function saveXmlAndViewsAsZip(
 function getTimestamp() {
   const date = new Date();
   return date.toISOString().replace(/:/g, "-");
+}
+
+export async function getWorkflowAsSVG(modeler) {
+  return modeler.saveSVG({ format: true });
 }
 
 export async function saveWorkflowAsSVG(modeler, fileName, fileFormat) {
