@@ -1,6 +1,7 @@
 import PlanQKPlugin from "../../extensions/planqk/PlanQKPlugin";
 import QuantMEPlugin from "../../extensions/quantme/QuantMEPlugin";
 import DataFlowPlugin from "../../extensions/dataflow/DataFlowPlugin";
+import BlockMEPlugin from "../../extensions/blockme/BlockMEPlugin";
 import QHAnaPlugin from "../../extensions/qhana/QHAnaPlugin";
 import PatternPlugin from "../../extensions/pattern/PatternPlugin";
 import OpenTOSCAPlugin from "../../extensions/opentosca/OpenTOSCAPlugin";
@@ -41,6 +42,10 @@ const PLUGINS = [
     plugin: OpenTOSCAPlugin,
     dependencies: [],
   },
+  {
+    plugin: BlockMEPlugin,
+    dependencies: [],
+  },
 ];
 
 // list of currently active plugins in the current running instance of the modeler, defined based on the plugin configuration
@@ -53,6 +58,7 @@ export function getActivePlugins() {
     activePlugins = [];
 
     const loadPlugin = (plugin) => {
+
       if (!activePlugins.includes(plugin.plugin)) {
         activePlugins.push(plugin.plugin);
         for (const dependency of plugin.dependencies) {
@@ -70,6 +76,7 @@ export function getActivePlugins() {
     };
 
     for (const pluginConfig of getAllConfigs()) {
+      console.info("Trying to load plugin config: " + pluginConfig.name);
       const plugin = PLUGINS.find(
         (p) =>
           p.plugin.name === pluginConfig.name &&
@@ -85,8 +92,10 @@ export function getActivePlugins() {
 }
 
 export function checkEnabledStatus(pluginName) {
+  console.info("Trying to load plugin: " + pluginName);
   switch (pluginName) {
     case pluginNames.DATAFLOW:
+      //console.log("process.env.ENABLE_DATA_FLOW_PLUGIN===" + process.env.ENABLE_DATA_FLOW_PLUGIN);
       return process.env.ENABLE_DATA_FLOW_PLUGIN !== "false";
     case pluginNames.PLANQK:
       return process.env.ENABLE_PLANQK_PLUGIN !== "false";
@@ -98,6 +107,8 @@ export function checkEnabledStatus(pluginName) {
       return process.env.ENABLE_PATTERN_PLUGIN !== "false";
     case pluginNames.OPENTOSCA:
       return process.env.ENABLE_OPENTOSCA_PLUGIN !== "false";
+    case pluginNames.BLOCKME:
+      return process.env.ENABLE_BLOCKME_PLUGIN !== "false";
   }
 }
 

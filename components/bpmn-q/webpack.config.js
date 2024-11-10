@@ -16,6 +16,7 @@ let defaultConfig = {
   ENABLE_QHANA_PLUGIN: "true",
   ENABLE_QUANTME_PLUGIN: "true",
   ENABLE_OPENTOSCA_PLUGIN: "true",
+  ENABLE_BLOCKME_PLUGIN: "true",
   GITHUB_TOKEN: "",
   OPENTOSCA_ENDPOINT: "http://localhost:1337/csars",
   NISQ_ANALYZER_ENDPOINT: "http://localhost:8098/nisq-analyzer",
@@ -51,8 +52,10 @@ for (let env_var_name in defaultConfig) {
 
   let build_time_env_var = process.env[env_var_name];
 
-  if (build_time_env_var) {
+  if (build_time_env_var && build_time_env_var.trim().length > 0) {
     build_time_env_var = JSON.stringify(build_time_env_var);
+  } else {
+    build_time_env_var = undefined;
   }
 
   let default_env_var_value = JSON.stringify(defaultConfig[env_var_name]);
