@@ -1,4 +1,4 @@
-# Quantum Workflow Modeler
+# Quantum Workflow Modeler (with BlockME Plugin)
 
 [![GitHub license](https://img.shields.io/github/license/PlanQK/workflow-modeler)](https://github.com/PlanQK/workflow-modeler/blob/master/LICENSE)
 [![Tests](https://github.com/PlanQK/workflow-modeler/actions/workflows/run-npm-test.yml/badge.svg)](https://github.com/PlanQK/workflow-modeler/actions/workflows/run-npm-test.yml)
